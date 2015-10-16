@@ -1,3 +1,4 @@
+
 --libs
 local bump = require 'lib.bump'
 local inspect = require 'lib.inspect'
@@ -10,6 +11,7 @@ local Player = require 'src.player'
 local MapSystem = require 'src.mapsystem'
 local Blocks = require 'src.blocks'
 local Quads = require 'src.quads'
+local Entity = require 'src.entity'
 
 local map = txt.parseMap('levels/level_0.txt')
 local world = bump.newWorld()
