@@ -3,8 +3,6 @@ local txt = require 'lib.txt'
 local Blocks = require 'src.blocks'
 local MapSystem = class('MapSystem')
 
-local map = txt.parseMap('levels/level_0.txt')
-
 function MapSystem:initialize(x, y, map)
     self.x, self.y = x, y
     self.data = {}
@@ -12,6 +10,7 @@ function MapSystem:initialize(x, y, map)
     self.mapwidth, self.mapheight = map.w, map.h 
     self.tilewidth, self.tileheight = map.tilewidth, map.tileheight
     self.created_at = love.timer.getTime()
+    self.itemCount = 0
 end
 
 function MapSystem:loadTiles(map)
@@ -24,9 +23,10 @@ function MapSystem:loadTiles(map)
                 local num = v.data[j]
                 if num == 1 then
                     Blocks:newBlock(self.x, self.y, tilewidth, tileheight, "Solid")
-                -- elseif num == 2 then
-                --     Blocks:newBlock(self.x, self.y, tilewidth, tileheight, "Key", j)
-                --     roomKeyCount = roomKeyCount + 1
+                    
+                elseif num == 2 then
+                    Blocks:newBlock(self.x, self.y, tilewidth, tileheight, "Key", j)
+                    self.itemCount = self.itemCount + 1
                 -- elseif num == 3 then
                 --     Blocks:newBlock(self.x, self.y, tilewidth, tileheight, "Door")
                 end
@@ -42,12 +42,50 @@ function MapSystem:loadTiles(map)
     end
 end
 
-function MapSystem:loadMap()
+function MapSystem:loadMap(map)
     self:initialize(0, 0, map)
     self:loadTiles(map)
 end
 
-function MapSystem:drawTiles(tileset, quadInfo, quads)
+--[[function that returns the x and y position of a type of tile (use would be for setting the 
+    players x and y with a player origin block at the beginning of a level or the nearest checkpoint).    
+]]
+function MapSystem:returnTileCoors(tileNum)
+    local x, y = 0, 0
+    local coors = {}
+    local mapwidth = self.mapwidth
+    local tilewidth, tileheight = self.tilewidth, self.tileheight
+    for i=1, #self.map.layers do 
+        local v = self.map.layers[i]
+
+        for j=1, #v.data do
+            local num = v.data[j]
+            if num == tileNum then
+                print(x, y)
+                return x, y
+            end
+            if j % mapwidth == 0 then
+                x = 0
+                y = y + tileheight
+            else
+                x = x + tilewidth
+            end
+        end
+        -- for j=1, #v.data do
+        --     if v.name == type then
+        --     return x, y
+        -- end
+        --     if j % mapwidth == 0 then
+        --         x = 0
+        --         y = y + tileheight
+        --     else
+        --         x = x + tilewidth
+        --     end
+        -- end
+    end
+end
+
+function MapSystem:drawTiles(tileset, quadInfo, quads, map)
     local x, y = 0, 0
     for i=1, #self.data do
         local num = self.data[i]

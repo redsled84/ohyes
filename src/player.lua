@@ -13,7 +13,11 @@ function Player:initialize(world, x,y,w,h)
 end
 
 function Player:filter(other)
-    return 'slide'
+    if other.type ~= 'Key' then
+        return 'slide'
+    else
+        return 'cross'
+    end
 end
 
 function Player:changeVelocityByKeys(dt)
@@ -62,6 +66,9 @@ function Player:moveCollide(dt)
 
     for i=1, len do
         local col = cols[i]
+        if col.other.type == "Key" then
+            self:addKey()
+        end
         self:changeVelocityByCollisionNormal(col.normal.x, col.normal.y, bounciness)
         self:checkIfOnGround(col.normal.y)
         self:checkJumpCount(col.normal.y)
@@ -70,8 +77,22 @@ function Player:moveCollide(dt)
     self.x, self.y = nextX, nextY
 end
 
-function Player:setMaxJumpHeight()
-    self.jumpFactor = self.jumpFactorMax
+function Player:addKey()
+    if self.keyCount ~= nil then
+        self.keyCount = self.keyCount + 1
+    else
+        self.keyCount = 0
+    end 
+end
+
+function Player:canPassLevel(maxItemCount)
+    if self.keyCount ~= nil then
+        if self.keyCount >= maxItemCount then
+            return true
+        else
+            return false
+        end
+    end
 end
 
 function Player:jumpWithKey(key)
@@ -89,6 +110,13 @@ end
 function Player:cameraLogic(cam)
     cam:setX(self.x)
     cam:setY(self.y)
+end
+
+function Player:update(dt)
+    Player:changeVelocityByGravity(dt)
+    Player:changeVelocityByKeys(dt)
+    Player:moveCollide(dt)
+    Player:cameraLogic(cam)
 end
 
 function Player:draw()
