@@ -43,9 +43,6 @@ function love.load()
 
     local PlayerLoadX, PlayerLoadY = MapSystem:returnTileCoors(4)
 	Player:initialize(world, PlayerLoadX, PlayerLoadY, 32, 32)
-
-    MapSystem:removeTile(960, 224)
-    print(MapSystem.data[255])
 end
 
 function love.update(dt)
@@ -70,5 +67,5 @@ function love.keypressed(key)
 		love.event.quit()
 	end
 
-    Player:jumpWithKey(key)
+    Player:jump(key)
 end

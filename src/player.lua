@@ -1,6 +1,7 @@
 local class = require 'lib.middleclass'
 local inspect = require 'lib.inspect'
 local Blocks = require 'src.blocks'
+local MapSystem = require 'src.mapsystem'
 local Entity = require 'src.entity'
 local Player = class('Player', Entity)
 
@@ -11,15 +12,15 @@ function Player:initialize(world, x,y,w,h)
 	Entity.initialize(self, world, x, y, w, h)
     self.jumpFactor = -432
     self.jumpCount, self.jumpCountMax = 0, 2
+    self.keyCount = 0
     self.onGround = false
 end
 
 function Player:filter(other)
     if other.type == 'Key' then
         return 'cross'
-    elseif other.type == 'Solid' then
-        return 'slide'
     end
+    return 'slide'
 end
 
 function Player:changeVelocityByKeys(dt)
@@ -59,7 +60,7 @@ function Player:checkJumpCount(ny)
     if ny < 0 then self.jumpCount = 0 end
 end
 
-local debugStr = {'','','',''}
+local debugStr = {'','','','',''}
 
 function Player:moveCollide(dt)
     local world = self.world
@@ -73,21 +74,29 @@ function Player:moveCollide(dt)
         if col.other.type == "Key" then
             self:addKey()
             world:remove(col.other)
+            MapSystem:removeTile(col.other.x, col.other.y)
         end
 
         --debug stuff
         if col.normal.y == -1 then
-            debugStr[1] = "Bottom: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y -- concat. tile index
+            local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
+            debugStr[1] = "Bottom: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         end
         if col.normal.y == 1 then
-            debugStr[2] = "Top: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y -- concat. tile index
+            local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
+            debugStr[2] = "Top: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         end
         if col.normal.x == 1 then
-            debugStr[3] = "Right: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y -- concat. tile index
+            local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
+            debugStr[3] = "Right: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         end
         if col.normal.x == -1 then
-            debugStr[4] = "Left: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y -- concat. tile index
+            local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
+            debugStr[4] = "Left: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         end
+
+        local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
+        debugStr[5] = "Current: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         
         self:changeVelocityByCollisionNormal(col.normal.x, col.normal.y, bounciness)
         self:checkIfOnGround(col.normal.y)
@@ -101,7 +110,7 @@ function Player:addKey()
     if self.keyCount ~= nil then
         self.keyCount = self.keyCount + 1
     else
-        self.keyCount = 0
+        self.keyCount = 1
     end 
 end
 
@@ -115,7 +124,7 @@ function Player:canPassLevel(maxItemCount)
     end
 end
 
-function Player:jumpWithKey(key)
+function Player:jump(key)
     if (key == ' ' or key == 'up') and 
         (self.onGround or self.jumpCount < self.jumpCountMax) then
         if self.jumpCount < 1 then
@@ -137,8 +146,6 @@ function Player:update(dt)
     Player:changeVelocityByKeys(dt)
     Player:moveCollide(dt)
     Player:cameraLogic(cam)
-
-    --check keycount
 end
 
 function Player:drawPlayer()
