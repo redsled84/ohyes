@@ -1,4 +1,5 @@
 local class = require 'lib.middleclass'
+local inspect = require 'lib.inspect'
 local Entity = require 'src.entity'
 local Player = class('Player', Entity)
 
@@ -13,10 +14,10 @@ function Player:initialize(world, x,y,w,h)
 end
 
 function Player:filter(other)
-    if other.type ~= 'Key' then
-        return 'slide'
-    else
+    if other.type == 'Key' then
         return 'cross'
+    elseif other.type == 'Solid' then
+        return 'slide'
     end
 end
 
@@ -57,6 +58,8 @@ function Player:checkJumpCount(ny)
     if ny < 0 then self.jumpCount = 0 end
 end
 
+local debugStr = {'','','',''}
+
 function Player:moveCollide(dt)
     local world = self.world
     self.onGround = false
@@ -68,7 +71,24 @@ function Player:moveCollide(dt)
         local col = cols[i]
         if col.other.type == "Key" then
             self:addKey()
+            print(col.other.x, col.other.y)
+            world:remove(col.other)
         end
+
+        --debug stuff
+        if col.normal.y == -1 then
+            debugStr[1] = "Bottom: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y -- concat. tile index
+        end
+        if col.normal.y == 1 then
+            debugStr[2] = "Top: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y -- concat. tile index
+        end
+        if col.normal.x == 1 then
+            debugStr[3] = "Right: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y -- concat. tile index
+        end
+        if col.normal.x == -1 then
+            debugStr[4] = "Left: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y -- concat. tile index
+        end
+        
         self:changeVelocityByCollisionNormal(col.normal.x, col.normal.y, bounciness)
         self:checkIfOnGround(col.normal.y)
         self:checkJumpCount(col.normal.y)
@@ -119,8 +139,14 @@ function Player:update(dt)
     Player:cameraLogic(cam)
 end
 
-function Player:draw()
+function Player:drawPlayer()
 	love.graphics.rectangle('fill', self.x, self.y, self.w, self.h)
+end
+
+function Player:drawDebugStrings(x, y)
+    for i=1, #debugStr do
+        love.graphics.print(debugStr[i], x+15, y+15*i)
+    end
 end
 
 return Player
