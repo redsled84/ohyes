@@ -61,7 +61,6 @@ function MapSystem:returnTileCoors(tileNum)
         for j=1, #v.data do
             local num = v.data[j]
             if num == tileNum then
-                print(x, y)
                 return x, y
             end
             if j % mapwidth == 0 then
@@ -85,12 +84,26 @@ function MapSystem:returnTileCoors(tileNum)
     end
 end
 
-function MapSystem:drawTiles(tileset, quadInfo, quads, map)
+function MapSystem:removeTile(x, y)
+    print((x+32)/32)
+    print((y)/32)
+
+    local thing = y + (x+32)/32
+    print(thing)
+end
+
+function MapSystem:drawTiles(tileset, quadInfo, quads)
     local x, y = 0, 0
     for i=1, #self.data do
         local num = self.data[i]
         if num > 0 and num <= #quadInfo then
+            love.graphics.setColor(255,255,255)
             love.graphics.draw(tileset, quads[num], x, y)
+
+            love.graphics.rectangle('line', x, y, self.tilewidth, self.tileheight)
+            love.graphics.setColor(0,255,0)
+            love.graphics.print(tostring(x), x+5, y+5)
+            love.graphics.print(tostring(y), x+5, y+15)
         end
         if i % self.mapwidth == 0 then
             x = 0
@@ -100,5 +113,6 @@ function MapSystem:drawTiles(tileset, quadInfo, quads, map)
         end
     end
 end
+
 
 return MapSystem
