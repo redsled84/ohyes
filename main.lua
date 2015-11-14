@@ -1,5 +1,3 @@
---Dick Splinters 
-
 --libs
 local bump = require 'lib.bump'
 local inspect = require 'lib.inspect'
@@ -45,18 +43,25 @@ function love.load()
 
     local PlayerLoadX, PlayerLoadY = MapSystem:returnTileCoors(4)
 	Player:initialize(world, PlayerLoadX, PlayerLoadY, 32, 32)
+
+    MapSystem:removeTile(960, 224)
+    print(MapSystem.data[255])
 end
 
 function love.update(dt)
     Player:update(dt)
     Player:canPassLevel(MapSystem.itemCount)
     Blocks:checkBlocks()
+
+    debugX = cam:getCameraX() - cam.w / 2
+    debugY = cam:getCameraY() - cam.h / 2
 end
 
 function love.draw()
     cam:draw(function(l,t,w,h)
-        Player:draw()
-        MapSystem:drawTiles(tileset, Quads.quadInfo, Quads.quads, map)
+        Player:drawPlayer()
+        MapSystem:drawTiles(tileset, Quads.quadInfo, Quads.quads)
+        Player:drawDebugStrings(debugX, debugY)
     end)
 end
 

@@ -14,7 +14,7 @@ function Blocks:newBlock(x, y, w, h, type, item)
 end
 
 function Blocks:checkBlocks()
-	print(#self)
+	-- print(#self)
 end
 
 return Blocks

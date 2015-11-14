@@ -173,6 +173,14 @@ function gamera:getWindowY()
   return self.t
 end
 
+function gamera:getCameraX()
+  return self.x
+end
+
+function gamera:getCameraY()
+  return self.y
+end
+
 function gamera:getScale()
   return self.scale
 end
