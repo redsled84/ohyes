@@ -13,6 +13,11 @@ function Blocks:newBlock(x, y, w, h, type, item)
     world:add(block, x, y, w, h)
 end
 
+function Blocks:removeBlock(item)
+	local world = self.world
+	world:remove(item)
+end
+
 function Blocks:checkBlocks()
 	-- print(#self)
 end

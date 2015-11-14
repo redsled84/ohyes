@@ -1,5 +1,6 @@
 local class = require 'lib.middleclass'
 local inspect = require 'lib.inspect'
+local Blocks = require 'src.blocks'
 local Entity = require 'src.entity'
 local Player = class('Player', Entity)
 
@@ -71,7 +72,6 @@ function Player:moveCollide(dt)
         local col = cols[i]
         if col.other.type == "Key" then
             self:addKey()
-            print(col.other.x, col.other.y)
             world:remove(col.other)
         end
 
@@ -137,6 +137,8 @@ function Player:update(dt)
     Player:changeVelocityByKeys(dt)
     Player:moveCollide(dt)
     Player:cameraLogic(cam)
+
+    --check keycount
 end
 
 function Player:drawPlayer()
