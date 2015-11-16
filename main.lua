@@ -69,7 +69,8 @@ function love.keypressed(key)
 		love.event.quit()
 	end
     if key == 'r' then
-        LevelManager:resetLevel(MapSystem.data, txt.parseMap('levels/level_1.txt'))
+        LevelManager:resetLevel(MapSystem.data, txt.parseMap('levels/level_2.txt'))
+        print(Player.x, Player.y)
     end
     Player:jump(key)
 end

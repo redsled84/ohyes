@@ -60,6 +60,10 @@ function Player:checkJumpCount(ny)
     if ny < 0 then self.jumpCount = 0 end
 end
 
+function Player:setPosition(x, y) 
+    self.x, self.y = x, y
+end
+
 local debugStr = {'','','','',''}
 
 function Player:moveCollide(dt)
