@@ -8,6 +8,7 @@ local txt = require 'lib.txt'
 -- source files
 local Player = require 'src.player'
 local MapSystem = require 'src.mapsystem'
+local LevelManager = require 'src.levelmanager'
 local Blocks = require 'src.blocks'
 local Quads = require 'src.quads'
 local Entity = require 'src.entity'
@@ -40,6 +41,7 @@ function love.load()
     Quads.quads = Quads:loadQuads(map.tilewidth, map.tileheight, 
         tilesetW, tilesetH)
     MapSystem:loadMap(map)
+    LevelManager:initialize(world)
 
     local PlayerLoadX, PlayerLoadY = MapSystem:returnTileCoors(4)
 	Player:initialize(world, PlayerLoadX, PlayerLoadY, 32, 32)
@@ -66,6 +68,8 @@ function love.keypressed(key)
 	if key == 'escape' then
 		love.event.quit()
 	end
-
+    if key == 'r' then
+        LevelManager:resetLevel(MapSystem.data, txt.parseMap('levels/level_1.txt'))
+    end
     Player:jump(key)
 end
