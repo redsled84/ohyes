@@ -17,7 +17,7 @@ local map = txt.parseMap('levels/level_0.txt')
 local world = bump.newWorld()
 
 -- ** tilesets **
-local tileset = love.graphics.newImage('images/solid_tileset2.png')
+local tileset = love.graphics.newImage('images/solid_tileset.png')
 local tilesetW, tilesetH = tileset:getWidth(), tileset:getHeight()
 
 -- camera
@@ -50,7 +50,6 @@ end
 function love.update(dt)
     Player:update(dt)
     Player:canPassLevel(MapSystem.itemCount)
-    Blocks:checkBlocks()
 
     debugX = cam:getCameraX() - cam.w / 2
     debugY = cam:getCameraY() - cam.h / 2
@@ -69,8 +68,8 @@ function love.keypressed(key)
 		love.event.quit()
 	end
     if key == 'r' then
-        LevelManager:resetLevel(MapSystem.data, txt.parseMap('levels/level_2.txt'))
-        print(Player.x, Player.y)
+        local width, height = LevelManager:resetLevel(MapSystem.data, txt.parseMap('levels/level_2.txt'))
+        cam:setWorld(0, 0, width, height)
     end
     Player:jump(key)
 end

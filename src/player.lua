@@ -10,8 +10,8 @@ local jumpAccel = -100
 
 function Player:initialize(world, x,y,w,h)
 	Entity.initialize(self, world, x, y, w, h)
-    self.jumpFactor = -432
-    self.jumpCount, self.jumpCountMax = 0, 2
+    self.jumpFactor = -435
+    self.jumpCount, self.jumpCountMax = 0, 5
     self.keyCount = 0
     self.onGround = false
 end

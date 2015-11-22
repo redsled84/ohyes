@@ -50,29 +50,21 @@ end
 ]]
 function MapSystem:returnTileCoors(tileNum)
     local x, y = 0, 0
-    local coors = {}
-    local mapwidth = self.mapwidth
-    local tilewidth, tileheight = self.tilewidth, self.tileheight
-    for i=1, #self.map.layers do 
-        local v = self.map.layers[i]
-
-        for j=1, #v.data do
-            local num = v.data[j]
-            if num == tileNum then
-                return x, y
-            end
-            if j % mapwidth == 0 then
-                x = 0
-                y = y + tileheight
-            else
-                x = x + tilewidth
-            end
+    local index = nil
+    for i,n in ipairs(self.data) do
+        if n == 4 then
+            index = i
         end
     end
+    local r = 490 % self.mapwidth
+    local av = 490 - r
+    local wx = av / self.mapwidth + 1
+
+    return (av/32-1)*self.tilewidth, wx*self.tileheight
 end
 
 function MapSystem:getTileIndex(x, y)
-    local index = y + (x+32)/32
+    local index = y/self.tileheight*self.mapwidth + (x+self.tilewidth)/self.tilewidth
     return index
 end
 

@@ -1,5 +1,3 @@
-local inspect = require "lib/inspect"
-
 local txt = {}
 
 function txt.parseMap(path, option)

@@ -28,6 +28,8 @@ function LevelManager:resetLevel(data, map)
 	MapSystem:loadMap(map)
 	local PlayerLoadX, PlayerLoadY = MapSystem:returnTileCoors(4)
 	Player:setPosition(PlayerLoadX, PlayerLoadY)
+	local width, height = MapSystem.tilewidth*MapSystem.mapwidth, MapSystem.tileheight*MapSystem.mapheight
+	return width, height
 end
 
 function LevelManager:playerNextLevel()
