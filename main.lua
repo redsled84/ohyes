@@ -44,7 +44,7 @@ function love.load()
     LevelManager:initialize(world)
 
     local PlayerLoadX, PlayerLoadY = MapSystem:returnTileCoors(4)
-	Player:initialize(world, PlayerLoadX, PlayerLoadY, 32, 32)
+    Player:initialize(world, PlayerLoadX, PlayerLoadY, 32, 32)
 end
 
 function love.update(dt)
@@ -64,9 +64,9 @@ function love.draw()
 end
 
 function love.keypressed(key)
-	if key == 'escape' then
-		love.event.quit()
-	end
+    if key == 'escape' then
+        love.event.quit()
+    end
     if key == 'r' then
         local width, height = LevelManager:resetLevel(MapSystem.data, txt.parseMap('levels/level_2.txt'))
         cam:setWorld(0, 0, width, height)
