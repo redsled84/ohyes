@@ -6,13 +6,12 @@ local LevelManager = class('LevelManager')
 
 function LevelManager:initialize(world)
 	self.world = world
-
 end
 
 function LevelManager:deleteLevel(data)
 	local world = self.world
 	for i=1, #data do
-		data[i] = 0
+		data[i] = nil
 	end
 	local items, len = world:getItems()
 	for i=1, len do
@@ -24,7 +23,7 @@ function LevelManager:deleteLevel(data)
 end
 
 function LevelManager:resetLevel(data, map)
-	self:deleteLevel(data)
+	self:deleteLevel(data) 
 	MapSystem:loadMap(map)
 	local PlayerLoadX, PlayerLoadY = MapSystem:returnTileCoors(4)
 	Player:setPosition(PlayerLoadX, PlayerLoadY)

@@ -17,7 +17,7 @@ local map = txt.parseMap('levels/level_0.txt')
 local world = bump.newWorld()
 
 -- ** tilesets **
-local tileset = love.graphics.newImage('images/solid_tileset.png')
+local tileset = love.graphics.newImage('images/solid_tileset2.png')
 local tilesetW, tilesetH = tileset:getWidth(), tileset:getHeight()
 
 -- camera

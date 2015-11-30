@@ -56,11 +56,10 @@ function MapSystem:returnTileCoors(tileNum)
             index = i
         end
     end
-    local r = 490 % self.mapwidth
-    local av = 490 - r
-    local wx = av / self.mapwidth + 1
-
-    return (av/32-1)*self.tilewidth, wx*self.tileheight
+    local tempx = (index % self.mapwidth) * self.tilewidth - 32
+    local tempy = (index - index % self.mapwidth) / self.mapwidth * self.tileheight
+    x, y = tempx, tempy
+    return x, y
 end
 
 function MapSystem:getTileIndex(x, y)
