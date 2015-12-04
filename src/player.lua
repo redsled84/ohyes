@@ -9,44 +9,46 @@ local frc, acc, dec, top, low = 700, 500, 6000, 350, 50
 local jumpAccel = -100
 
 function Player:initialize(world, x,y,w,h)
-	Entity.initialize(self, world, x, y, w, h)
+    Entity.initialize(self, world, x, y, w, h)
     self.jumpFactor = -435
     self.jumpCount, self.jumpCountMax = 0, 2
     self.keyCount = 0
+    self.isDoor = false
     self.onGround = false
 end
 
 function Player:filter(other)
-    if other.type == 'Key' then
+    if other.type == 'Key' or other.type == 'Door' then
         return 'cross'
+    else
+        return 'slide'
     end
-    return 'slide'
 end
 
 function Player:changeVelocityByKeys(dt)
     local lk = love.keyboard
-	local vx, vy = self.vx, self.vy
+    local vx, vy = self.vx, self.vy
 
-	if lk.isDown('right') then
-    	if vx < 0 then
-    		vx = vx + dec * dt
-    	elseif vx < top then
-    		vx = vx + acc * dt
-    	end
+    if lk.isDown('right') then
+        if vx < 0 then
+            vx = vx + dec * dt
+        elseif vx < top then
+            vx = vx + acc * dt
+        end
     elseif lk.isDown('left') then
-    	if vx > 0 then
-    		vx = vx - dec * dt
-    	elseif vx > -top then
-    		vx = vx - acc * dt
-    	end
+        if vx > 0 then
+            vx = vx - dec * dt
+        elseif vx > -top then
+            vx = vx - acc * dt
+        end
     else
-    	if math.abs(vx) < low then
-    		vx = 0
-    	elseif vx > 0 then
-    		vx = vx - frc * dt
-    	elseif vx < 0 then
-    		vx = vx + frc * dt
-    	end
+        if math.abs(vx) < low then
+            vx = 0
+        elseif vx > 0 then
+            vx = vx - frc * dt
+        elseif vx < 0 then
+            vx = vx + frc * dt
+        end
     end
 
     self.vx, self.vy = vx, vy
@@ -75,32 +77,37 @@ function Player:moveCollide(dt)
 
     for i=1, len do
         local col = cols[i]
-        if col.other.type == "Key" then
+        if col.other.type == 'Key' then
             self:addKey()
             world:remove(col.other)
             MapSystem:removeTile(col.other.x, col.other.y)
+        end
+        if col.other.type == 'Door' then
+            self.isDoor = true
+        else
+            self.isDoor = false
         end
 
         --debug stuff
         if col.normal.y == -1 then
             local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
-            debugStr[1] = "Bottom: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
+            debugStr[1] = 'Bottom: '..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         end
         if col.normal.y == 1 then
             local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
-            debugStr[2] = "Top: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
+            debugStr[2] = 'Top: '..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         end
         if col.normal.x == 1 then
             local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
-            debugStr[3] = "Right: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
+            debugStr[3] = 'Right: '..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         end
         if col.normal.x == -1 then
             local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
-            debugStr[4] = "Left: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
+            debugStr[4] = 'Left: '..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         end
 
         local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
-        debugStr[5] = "Current: "..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
+        debugStr[5] = 'Current: '..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         
         self:changeVelocityByCollisionNormal(col.normal.x, col.normal.y, bounciness)
         self:checkIfOnGround(col.normal.y)
@@ -120,12 +127,24 @@ end
 
 function Player:canPassLevel(maxItemCount)
     if self.keyCount ~= nil then
-        if self.keyCount >= maxItemCount then
+        if self.keyCount >= maxItemCount and self.isDoor then
             return true
         else
             return false
         end
     end
+end
+
+function Player:resetValues()
+    self.xvel, self.yvel = 0, 0
+    self.keyCount = 0
+end
+
+function Player:resetPlayer(x, y)
+    local x = x or 0
+    local y = y or 0
+    self:setPosition(x, y)
+    self:resetValues()
 end
 
 function Player:jump(key)
@@ -153,7 +172,7 @@ function Player:update(dt)
 end
 
 function Player:drawPlayer()
-	love.graphics.rectangle('fill', self.x, self.y, self.w, self.h)
+    love.graphics.rectangle('fill', self.x, self.y, self.w, self.h)
 end
 
 function Player:drawDebugStrings(x, y)

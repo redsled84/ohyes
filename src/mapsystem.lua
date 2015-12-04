@@ -16,6 +16,7 @@ end
 function MapSystem:loadTiles(map)
     local mapwidth = self.mapwidth
     local tilewidth, tileheight = self.tilewidth, self.tileheight
+    self.itemCount = 0
     for i=1, #self.map.layers do
         local v = self.map.layers[i]
         if v.name == "Solid" then
@@ -23,11 +24,12 @@ function MapSystem:loadTiles(map)
                 local num = v.data[j]
                 if num == 1 then
                     Blocks:newBlock(self.x, self.y, tilewidth, tileheight, "Solid")
-                    
                 elseif num == 2 then
-                    Blocks:newBlock(self.x, self.y, tilewidth, tileheight, "Key", j)
+                    Blocks:newBlock(self.x, self.y, tilewidth, tileheight, "Key")
                     self.itemCount = self.itemCount + 1
-                end
+                elseif num == 3 then
+                    Blocks:newBlock(self.x, self.y, tilewidth, tileheight, "Door")
+                end 
                 if j % mapwidth == 0 then
                     self.x = 0
                     self.y = self.y + tileheight
@@ -50,7 +52,6 @@ end
 ]]
 function MapSystem:returnTileCoors(tileNum)
     local x, y = 0, 0
-    local index = nil
     for i,n in ipairs(self.data) do
         if n == 4 then
             index = i

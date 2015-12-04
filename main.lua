@@ -42,17 +42,26 @@ function love.load()
         tilesetW, tilesetH)
     MapSystem:loadMap(map)
     LevelManager:initialize(world)
+    LevelManager:loadLevels("levels")
 
     local PlayerLoadX, PlayerLoadY = MapSystem:returnTileCoors(4)
     Player:initialize(world, PlayerLoadX, PlayerLoadY, 32, 32)
 end
 
 function love.update(dt)
+    var = false
+
     Player:update(dt)
     Player:canPassLevel(MapSystem.itemCount)
 
+    local width, height = MapSystem.tilewidth*MapSystem.mapwidth, MapSystem.tileheight*MapSystem.mapheight
+    cam:setWorld(0, 0, width, height)
+
     debugX = cam:getCameraX() - cam.w / 2
-    debugY = cam:getCameraY() - cam.h / 2
+    debugY = cam:getCameraY() - cam.h / 2        
+
+    local var = Player:canPassLevel(MapSystem.itemCount)
+    print(Player.keyCount, var, MapSystem.itemCount)
 end
 
 function love.draw()
@@ -68,8 +77,14 @@ function love.keypressed(key)
         love.event.quit()
     end
     if key == 'r' then
-        local width, height = LevelManager:resetLevel(MapSystem.data, txt.parseMap('levels/level_2.txt'))
-        cam:setWorld(0, 0, width, height)
+        local var = Player:canPassLevel(MapSystem.itemCount)
+        if var then
+            LevelManager:nextLevel(MapSystem.data)
+            print(var, MapSystem.itemCount)
+            local PlayerLoadX, PlayerLoadY = MapSystem:returnTileCoors(4)
+            world:update(Player, PlayerLoadX, PlayerLoadY)
+            Player:resetPlayer(PlayerLoadX, PlayerLoadY)
+        end
     end
     Player:jump(key)
 end
