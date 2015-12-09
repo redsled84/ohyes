@@ -4,11 +4,11 @@ local txt = require 'lib.txt'
 local MapSystem = require 'src.mapsystem'
 local Player = require 'src.player'
 local LevelManager = class('LevelManager') 
+LevelManager.currLevel = 3
 
 function LevelManager:initialize(world)
 	self.world = world
 	self.levels = {}
-	self.currLevel = 1
 end
 
 -- PLANS: adjust code to fit a hub world design

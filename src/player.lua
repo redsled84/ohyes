@@ -17,12 +17,8 @@ function Player:initialize(world, x,y,w,h)
     self.onGround = false
 end
 
-function Player:filter(other)
-    if other.type == 'Key' or other.type == 'Door' then
-        return 'cross'
-    else
-        return 'slide'
-    end
+local function collisionFilter(item, other)
+    return 'slide'
 end
 
 function Player:changeVelocityByKeys(dt)
@@ -73,7 +69,7 @@ function Player:moveCollide(dt)
     self.onGround = false
 
     local futureX, futureY = self.x + (self.vx * dt), self.y + (self.vy * dt)
-    local nextX, nextY, cols, len = world:move(self, futureX, futureY, self.filter)
+    local nextX, nextY, cols, len = world:move(self, futureX, futureY, collisionFilter)
 
     for i=1, len do
         local col = cols[i]
@@ -86,24 +82,6 @@ function Player:moveCollide(dt)
             self.isDoor = true
         else
             self.isDoor = false
-        end
-
-        --debug stuff
-        if col.normal.y == -1 then
-            local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
-            debugStr[1] = 'Bottom: '..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
-        end
-        if col.normal.y == 1 then
-            local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
-            debugStr[2] = 'Top: '..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
-        end
-        if col.normal.x == 1 then
-            local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
-            debugStr[3] = 'Right: '..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
-        end
-        if col.normal.x == -1 then
-            local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
-            debugStr[4] = 'Left: '..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         end
 
         local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
@@ -156,6 +134,12 @@ function Player:jump(key)
             self.vy = self.jumpFactor - 50
         end
         self.jumpCount = self.jumpCount + 1
+    end
+end
+
+function Player:shootArrow(key)
+    if key == "s" then
+        return true
     end
 end
 

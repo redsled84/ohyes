@@ -12,8 +12,10 @@ local LevelManager = require 'src.levelmanager'
 local Blocks = require 'src.blocks'
 local Quads = require 'src.quads'
 local Entity = require 'src.entity'
+local Arrow = require 'src.arrow'
 
-local map = txt.parseMap('levels/level_0.txt')
+local map = txt.parseMap('levels/level_3.txt')
+
 local world = bump.newWorld()
 
 -- ** tilesets **
@@ -43,30 +45,29 @@ function love.load()
     MapSystem:loadMap(map)
     LevelManager:initialize(world)
     LevelManager:loadLevels("levels")
+    Arrow:initialize(world)
 
     local PlayerLoadX, PlayerLoadY = MapSystem:returnTileCoors(4)
     Player:initialize(world, PlayerLoadX, PlayerLoadY, 32, 32)
 end
 
 function love.update(dt)
-    var = false
-
+    Arrow:updateArrows(dt)
     Player:update(dt)
     Player:canPassLevel(MapSystem.itemCount)
 
     local width, height = MapSystem.tilewidth*MapSystem.mapwidth, MapSystem.tileheight*MapSystem.mapheight
     cam:setWorld(0, 0, width, height)
-
     debugX = cam:getCameraX() - cam.w / 2
     debugY = cam:getCameraY() - cam.h / 2        
-
     local var = Player:canPassLevel(MapSystem.itemCount)
-    print(Player.keyCount, var, MapSystem.itemCount)
+    -- print(Player.keyCount, var, MapSystem.itemCount)
 end
 
 function love.draw()
     cam:draw(function(l,t,w,h)
         Player:drawPlayer()
+        Arrow:drawArrows()
         MapSystem:drawTiles(tileset, Quads.quadInfo, Quads.quads)
         Player:drawDebugStrings(debugX, debugY)
     end)
@@ -87,4 +88,9 @@ function love.keypressed(key)
         end
     end
     Player:jump(key)
+    local canShoot = Player:shootArrow(key)
+    if canShoot then
+        Arrow:shoot(Player.x+Player.w, Player.y)
+        Player.vx = Player.vx - 200
+    end
 end
