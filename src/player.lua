@@ -84,6 +84,10 @@ function Player:moveCollide(dt)
             self.isDoor = false
         end
 
+        if col.other.type == 'Enemy' then
+            gameState = "dead"
+        end
+
         local tileIndex = MapSystem:getTileIndex(col.other.x, col.other.y)
         debugStr[5] = 'Current: '..col.other.type..' x: '..col.other.x..' y: '..col.other.y..' i: '..tileIndex
         
@@ -156,6 +160,7 @@ function Player:update(dt)
 end
 
 function Player:drawPlayer()
+    love.graphics.setColor(255,255,255)
     love.graphics.rectangle('fill', self.x, self.y, self.w, self.h)
 end
 

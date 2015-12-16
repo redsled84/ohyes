@@ -4,7 +4,7 @@ local txt = require 'lib.txt'
 local MapSystem = require 'src.mapsystem'
 local Player = require 'src.player'
 local LevelManager = class('LevelManager') 
-LevelManager.currLevel = 3
+LevelManager.currLevel = 2
 
 function LevelManager:initialize(world)
 	self.world = world

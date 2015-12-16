@@ -1,6 +1,7 @@
 local class = require 'lib.middleclass'
 local txt = require 'lib.txt'
 local Blocks = require 'src.blocks'
+local Enemy = require 'src.enemy'
 local MapSystem = class('MapSystem')
 
 function MapSystem:initialize(x, y, map)
@@ -29,6 +30,8 @@ function MapSystem:loadTiles(map)
                     self.itemCount = self.itemCount + 1
                 elseif num == 3 then
                     Blocks:newBlock(self.x, self.y, tilewidth, tileheight, "Door")
+                elseif num == 5 then
+                    Enemy:newEnemy(self.x, self.y, tilewidth, tileheight)
                 end 
                 if j % mapwidth == 0 then
                     self.x = 0
@@ -77,7 +80,7 @@ function MapSystem:drawTiles(tileset, quadInfo, quads)
     local x, y = 0, 0
     for i=1, #self.data do
         local num = self.data[i]
-        if num > 0 and num <= #quadInfo then
+        if num > 0 and num <= #quadInfo-1 then
             love.graphics.setColor(255,255,255)
             love.graphics.draw(tileset, quads[num], x, y)
 

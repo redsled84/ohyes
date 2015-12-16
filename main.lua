@@ -1,3 +1,5 @@
+gameState = "play"
+
 --libs
 local bump = require 'lib.bump'
 local inspect = require 'lib.inspect'
@@ -12,9 +14,9 @@ local LevelManager = require 'src.levelmanager'
 local Blocks = require 'src.blocks'
 local Quads = require 'src.quads'
 local Entity = require 'src.entity'
-local Arrow = require 'src.arrow'
+local Enemy = require 'src.enemy'
 
-local map = txt.parseMap('levels/level_3.txt')
+local map = txt.parseMap('levels/level_' .. tostring(LevelManager.currLevel-1) .. '.txt')
 
 local world = bump.newWorld()
 
@@ -37,6 +39,7 @@ function love.load()
     cam = gamera.new(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     cam:setWorld(0, 0, map.w*map.tilewidth, map.h*map.tileheight)
 
+    Enemy:initialize(world)
     Blocks:initialize(world)
     Quads.quadInfo = Quads:loadQuadInfo(map.tilewidth, map.tileheight,
         tilesetW/map.tilewidth, tilesetH/map.tileheight)
@@ -45,14 +48,17 @@ function love.load()
     MapSystem:loadMap(map)
     LevelManager:initialize(world)
     LevelManager:loadLevels("levels")
-    Arrow:initialize(world)
 
+    love.graphics.setBackgroundColor(53,118,143)
+    font = love.graphics.newFont('fonts/font.ttf', 48)
     local PlayerLoadX, PlayerLoadY = MapSystem:returnTileCoors(4)
     Player:initialize(world, PlayerLoadX, PlayerLoadY, 32, 32)
 end
 
 function love.update(dt)
-    Arrow:updateArrows(dt)
+    if gameState == 'play' then
+    Enemy:update(dt, Player.x, Player.y)
+
     Player:update(dt)
     Player:canPassLevel(MapSystem.itemCount)
 
@@ -62,15 +68,25 @@ function love.update(dt)
     debugY = cam:getCameraY() - cam.h / 2        
     local var = Player:canPassLevel(MapSystem.itemCount)
     -- print(Player.keyCount, var, MapSystem.itemCount)
+
+    end
 end
 
 function love.draw()
     cam:draw(function(l,t,w,h)
         Player:drawPlayer()
-        Arrow:drawArrows()
+    
         MapSystem:drawTiles(tileset, Quads.quadInfo, Quads.quads)
-        Player:drawDebugStrings(debugX, debugY)
+        -- Player:drawDebugStrings(debugX, debugY)
+
+        Enemy:drawEnemies()
     end)
+
+    if gameState == "dead" then
+        love.graphics.setColor(255,255,255)
+        love.graphics.setFont(font)
+        love.graphics.print("YOU'RE DEAD KIDDO", cam:getCameraX()-120, cam:getCameraY())
+    end
 end
 
 function love.keypressed(key)
@@ -87,10 +103,6 @@ function love.keypressed(key)
             Player:resetPlayer(PlayerLoadX, PlayerLoadY)
         end
     end
+
     Player:jump(key)
-    local canShoot = Player:shootArrow(key)
-    if canShoot then
-        Arrow:shoot(Player.x+Player.w, Player.y)
-        Player.vx = Player.vx - 200
-    end
 end
